@@ -7,28 +7,50 @@ import Button from './Button';
 class App extends Component {
   constructor(props) {
     super();
-    this.state = { stateIndex: 0 };
+    this.state = { 
+      stateIndex: 0 ,
+      filter: 'Fire',
+      all: true
+    };
   }
 
     handleClick = () => {
-      const lastIndex = pokemons.length - 1;
-      const { stateIndex } = this.state;
+      const { stateIndex, filter, all } = this.state;
+      const filteredPokemons = pokemons.filter(pokemon => pokemon.type === filter);
+      const lastIndex = all ? pokemons.length - 1 : filteredPokemons.length - 1;
       if (stateIndex < lastIndex) {
-      this.setState((previousState, _props) => ({
-        stateIndex: previousState.stateIndex + 1,
+      this.setState((prev, _props) => ({
+        stateIndex: prev.stateIndex + 1,
       }));
       } else {
       this.setState(() => ( { stateIndex: 0 }));
       }
     }
 
+    changeFilter = ({ target }) => {
+      const { innerText } = target;
+      this.setState(() => ({ 
+        filter: innerText,
+        all: false, 
+        stateIndex: 0
+      }))
+    }
+
+    switchToAll = () => this.setState(() => ({ all: true }));
+
   render() {
-    const stateIndex = this.state.stateIndex;
-    const pokemon = pokemons.find((pokemon, index) => index === stateIndex);
+    const { stateIndex, filter, all } = this.state;
+    const filteredPokemons = pokemons.filter(pokemon => pokemon.type === filter);
+    const byFilter = filteredPokemons.find((pokemon, index) => index === stateIndex);
+    const byAll = pokemons.find((pokemon, index) => index === stateIndex);
+    const pokemon = all ? byAll : byFilter;
     return (
       <div className="App">
         <h1> Pokedex </h1>
         <Button buttonText=">>>" handleClick={this.handleClick} />
+        <Button buttonText="All" handleClick={this.switchToAll} />
+        <Button buttonText="Fire" handleClick={this.changeFilter} />
+        <Button buttonText="Psychic" handleClick={this.changeFilter} />
         <Pokedex pokemon={pokemon} />
       </div>
     );
